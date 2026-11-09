@@ -49,5 +49,23 @@ class AuditTests(unittest.TestCase):
         self.assertIn("name_mismatch", codes)
 
 
+    def test_ignores_links_in_fenced_examples(self):
+        with (self.skill / "SKILL.md").open("a", encoding="utf-8") as handle:
+            handle.write("\n~~~markdown\n[example](fake/path)\n~~~\n")
+        self.assertEqual(AUDITOR.audit(self.root)["issues"], [])
+
+    def test_cross_tier_collision_is_advisory(self):
+        curated = self.root / "skills" / ".curated" / "openai-docs"
+        system = self.root / "skills" / ".system" / "openai-docs"
+        for path in (curated, system):
+            path.mkdir(parents=True)
+            (path / "LICENSE.txt").write_text("fixture\n")
+            (path / "SKILL.md").write_text(
+                "---\nname: openai-docs\ndescription: Sample.\n---\n")
+        issues = [i for i in AUDITOR.audit(self.root)["issues"] if i["code"] == "name_shadowed"]
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0]["severity"], "warning")
+
+
 if __name__ == "__main__":
     unittest.main()
