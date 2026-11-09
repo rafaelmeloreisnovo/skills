@@ -1,11 +1,14 @@
-## Contributing
+## Contributing to this fork
 
-### Community values
+Be respectful and inclusive. Follow the [Contributor Covenant](https://www.contributor-covenant.org/).
 
-- **Be kind and inclusive.** Treat others with respect; we follow the [Contributor Covenant](https://www.contributor-covenant.org/).
-- **Assume good intent.** Written communication is hard - err on the side of generosity.
-- **Teach & learn.** If you spot something confusing, open an issue or PR with improvements.
+### Provenance and licensing
 
-### Security & responsible AI
+- Identify whether each change is imported from upstream, adapted under an existing license, or independently authored.
+- Record upstream URL/commit for imports, preserve all notices, and avoid adding a license for third-party material without authority.
+- Keep authorial changes in separate directories when possible; use a reviewable PR instead of direct changes to `main`.
+- Provide the exact validation command, its observed outcome, remaining gaps and rollback path. A passing parser or CI does not prove runtime safety.
 
-Have you discovered a vulnerability or have concerns about model output? Please e-mail **security@openai.com** and we will respond promptly.
+### Security reports
+
+Do not post credentials, sensitive data or exploit details publicly. Use GitHub private vulnerability reporting for this repository if the maintainer enables it; otherwise contact the repository owner privately through an established channel before disclosure. Do **not** route fork-specific security reports to `security@openai.com` merely because this repository was forked from OpenAI.
