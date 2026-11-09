@@ -14,6 +14,24 @@ LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 AUTHORIAL_PREFIX = "skills/rafaelia-skill-audit/"
 
 
+def without_fenced_examples(text):
+    """Discard fenced code samples before checking Markdown links."""
+    result = []
+    fence = None
+    for line in text.splitlines(keepends=True):
+        match = re.match(r"^[ \t]*(\x60{3,}|~{3,})", line)
+        if match:
+            marker = match.group(1)
+            if fence is None:
+                fence = marker
+            elif marker[0] == fence[0] and len(marker) >= len(fence):
+                fence = None
+            continue
+        if fence is None:
+            result.append(line)
+    return "".join(result)
+
+
 def audit(root):
     root = Path(root).resolve()
     target = root / "skills"
@@ -59,13 +77,19 @@ def audit(root):
         if not description:
             issue("error", "description_missing", relative, "Required description missing")
         if name in seen and name:
-            issue("error", "name_duplicate", relative, "Duplicate skill name also at " + seen[name])
+            prior = seen[name]
+            same_tier = (prior.split("/")[1] if prior.split("/")[1].startswith(".") else "authorial") == (relative.split("/")[1] if relative.split("/")[1].startswith(".") else "authorial")
+            authorial = prior.startswith(AUTHORIAL_PREFIX) or relative.startswith(AUTHORIAL_PREFIX)
+            if same_tier or authorial:
+                issue("error", "name_duplicate", relative, "Duplicate skill name also at " + prior)
+            else:
+                issue("warning", "name_shadowed", relative, "Skill also provided by other tier at " + prior)
         if name:
             seen[name] = relative
         licensed = any((directory / n).is_file() for n in ("LICENSE.txt", "LICENSE", "LICENSE.md"))
         if not licensed:
             issue("warning", "license_not_local", relative, "No individual license file found; inspect provenance")
-        for raw in LINK_RE.findall(body):
+        for raw in LINK_RE.findall(without_fenced_examples(body)):
             dest = raw.split()[0].strip("<>")
             if not dest or dest.startswith(("#", "https://", "http://", "mailto:", "data:", "/")):
                 continue
