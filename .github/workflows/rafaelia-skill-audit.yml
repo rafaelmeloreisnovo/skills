@@ -1,0 +1,34 @@
+name: RAFAELIA skill audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test auditor without third-party dependencies
+        run: python3 -m unittest discover -s skills/rafaelia-skill-audit/tests -v
+      - name: Audit authorial skill; report legacy findings
+        run: python3 skills/rafaelia-skill-audit/scripts/audit_skills.py --root . --policy authorial --output-json skill-audit.json
+      - name: Upload audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rafaelia-skill-audit
+          path: skill-audit.json
+          if-no-files-found: warn
+          retention-days: 14

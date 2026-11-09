@@ -1,0 +1,9 @@
+Copyright (c) 2026 rafaelmeloreisnovo. All rights reserved.
+
+This notice applies only to independently authored content in the
+skills/rafaelia-skill-audit/ directory. No general permission to copy,
+modify, sublicense, or distribute that content is granted here. Contact
+the repository owner for permission or a separately granted license.
+
+Third-party content elsewhere in this repository remains subject to its
+own licenses and notices. This notice does not change those terms.
